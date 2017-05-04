@@ -55,12 +55,25 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
             annotationView!.canShowCallout = true
             annotationView!.leftCalloutAccessoryView = UIImageView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
             
+            annotationView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+
+            annotationView!.image = thumbnail
+            
+            let pin = MKPinAnnotationView(annotation: annotationView!.annotation, reuseIdentifier: reuseID)
+            pin.image = thumbnail
+            
+            
         }
         
         let imageView = annotationView?.leftCalloutAccessoryView as! UIImageView
         imageView.image = thumbnail
         
         return annotationView
+    }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        
+        performSegue(withIdentifier: "fullImageSegue", sender: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
@@ -102,6 +115,12 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
         if segue.identifier == "tagSegue" {
             let vc = segue.destination as! LocationsViewController
             vc.delegate = self
+        }
+        
+        if segue.identifier == "fullImageSegue"{
+            let fullVC = segue.destination as! FullImageViewController
+            
+            fullVC.image = photoAnnotation.photo
         }
     }
     
