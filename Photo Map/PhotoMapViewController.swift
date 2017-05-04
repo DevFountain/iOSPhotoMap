@@ -13,6 +13,8 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
 
     @IBOutlet weak var mapView: MKMapView!
 
+    var photoAnnotation = PhotoAnnotation()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -28,17 +30,24 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
         
         if UIImagePickerController.isSourceTypeAvailable(.camera){
             vc.sourceType = .camera
-        }else{
+        } else {
             vc.sourceType = .photoLibrary
         }
-        
-        
-        
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        print("hello")
         let reuseID = "myAnnotationView"
+
+        let resizeRenderImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 45, height: 45))
+        resizeRenderImageView.layer.borderColor = UIColor.white.cgColor
+        resizeRenderImageView.layer.borderWidth = 3.0
+        resizeRenderImageView.contentMode = .scaleAspectFit
+        resizeRenderImageView.image = photoAnnotation.photo
+
+        UIGraphicsBeginImageContext(resizeRenderImageView.frame.size)
+        resizeRenderImageView.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let thumbnail = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
         
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID)
         if annotationView == nil{
@@ -49,15 +58,17 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
         }
         
         let imageView = annotationView?.leftCalloutAccessoryView as! UIImageView
-        imageView.image = UIImage(named: "camera")
+        imageView.image = thumbnail
         
         return annotationView
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        let originalImage = info[UIImagePickerControllerOriginalImage] as! UIImage
-        
+//        let originalImage = info[UIImagePickerControllerOriginalImage] as! UIImage
+
         let editedImage = info[UIImagePickerControllerEditedImage] as! UIImage
+
+        photoAnnotation.photo = editedImage
         
         dismiss(animated: true, completion: {
             self.performSegue(withIdentifier: "tagSegue", sender: nil)
