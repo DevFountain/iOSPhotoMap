@@ -9,7 +9,7 @@
 import MapKit
 import UIKit
 
-class PhotoMapViewController: UIViewController {
+class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
 
@@ -20,6 +20,28 @@ class PhotoMapViewController: UIViewController {
 
         let sfRegion = MKCoordinateRegionMake(CLLocationCoordinate2DMake(37.783333, -122.416667), MKCoordinateSpanMake(0.1, 0.1))
         mapView.setRegion(sfRegion, animated: false)
+        
+        let vc = UIImagePickerController()
+        vc.delegate = self
+        vc.allowsEditing = true
+        present(vc, animated: true, completion: nil)
+        
+        if UIImagePickerController.isSourceTypeAvailable(.camera){
+            vc.sourceType = .camera
+        }else{
+            vc.sourceType = .photoLibrary
+        }
+        
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let originalImage = info[UIImagePickerControllerOriginalImage] as! UIImage
+        
+        let editedImage = info[UIImagePickerControllerEditedImage] as! UIImage
+        
+        dismiss(animated: true, completion: {
+            self.performSegue(withIdentifier: "tagSegue", sender: nil)
+        })
     }
 
     override func didReceiveMemoryWarning() {
